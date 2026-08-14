@@ -819,6 +819,7 @@ input[type="file"] { padding: 8px; }
   gap: 6px;
 }
 .invoice-preview-wrapper[data-template="elegant"] .ip-seller { text-align: center; }
+.invoice-preview-wrapper[data-template="elegant"] .ip-logo { margin-left: auto; margin-right: auto; }
 .invoice-preview-wrapper[data-template="elegant"] .ip-meta {
   text-align: center;
   min-width: unset;

@@ -51,6 +51,7 @@ const renderLayout = (invoice, theme, numberToWords) => {
   const headerBg = theme.headerBg || 'transparent';
   const headerStyle = theme.headerStyle || '';
   const titleStyle = theme.titleStyle || '';
+  const extraCss = theme.extraCss || '';
   const grandTotalBg = theme.grandTotalBg || 'transparent';
   const grandTotalColor = theme.grandTotalColor || accent;
 
@@ -231,6 +232,8 @@ const renderLayout = (invoice, theme, numberToWords) => {
     .sig-authority { font-size: 12.5px; font-weight: 700; color: #111827; }
     .sig-line { border-top: 1.5px solid #374151; margin-top: 7px; padding-top: 5px; }
     .sig-line span { font-size: 11px; color: #4b5563; }
+
+    ${extraCss}
   </style>
 </head>
 <body>

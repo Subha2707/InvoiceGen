@@ -8,7 +8,7 @@ const VALID_TEMPLATES = ['classic', 'modern', 'elegant', 'corporate', 'bold'];
 
 // Bump this whenever the PDF templates change so existing cached PDFs are rebuilt
 // automatically the next time the user downloads an old invoice.
-const PDF_SCHEMA_VERSION = 'v3';
+const PDF_SCHEMA_VERSION = 'v4';
 
 const isValidPdfBase64 = (pdfBase64) => {
   if (!pdfBase64 || typeof pdfBase64 !== 'string') return false;
