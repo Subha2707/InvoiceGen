@@ -15,6 +15,13 @@ const dashboardRoutes = require('./src/routes/dashboard.routes');
 
 const app = express();
 
+// Render (and most hosts) terminate TLS and forward the client IP via
+// X-Forwarded-For. Express needs to trust that hop so rate limiting and
+// req.ip work correctly. Only enabled in production to avoid spoofing in dev.
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 app.use(helmet());
 app.use(cors({ origin: CLIENT_URL, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
