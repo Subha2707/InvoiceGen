@@ -47,7 +47,9 @@ const Signup = () => {
     <div className="auth-container">
       <div className="auth-card glassmorphism">
         <div className="auth-brand">
-          <div className="auth-logo">₹</div>
+          <div className="auth-logo">
+            <img className="brand-logo-img" src="/invoice-logo.png" alt="InvoiceGen" />
+          </div>
           <h1 className="auth-title">InvoiceGen</h1>
           <p className="auth-subtitle">Create your account and start invoicing</p>
         </div>

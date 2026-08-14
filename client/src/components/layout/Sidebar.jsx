@@ -10,7 +10,9 @@ const Sidebar = ({ isOpen, toggle }) => {
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <NavLink to="/dashboard" className="landing-brand" onClick={toggle}>
-          <div className="brand-icon">₹</div>
+          <div className="brand-icon">
+            <img className="brand-logo-img" src="/invoice-logo.png" alt="InvoiceGen" />
+          </div>
           <span>InvoiceGen</span>
         </NavLink>
         <button className="close-btn" onClick={toggle}><FiX /></button>

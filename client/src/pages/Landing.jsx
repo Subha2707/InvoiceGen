@@ -67,7 +67,9 @@ const Landing = () => {
       <header className="landing-nav glassmorphism">
         <div className="nav-container">
           <Link to="/" className="landing-brand">
-            <div className="brand-icon">₹</div>
+            <div className="brand-icon">
+              <img className="brand-logo-img" src="/invoice-logo.png" alt="InvoiceGen" />
+            </div>
             <span>InvoiceGen</span>
           </Link>
 
@@ -419,7 +421,9 @@ const Landing = () => {
         <div className="footer-container">
           <div className="footer-brand">
             <div className="landing-brand">
-              <div className="brand-icon">₹</div>
+              <div className="brand-icon">
+              <img className="brand-logo-img" src="/invoice-logo.png" alt="InvoiceGen" />
+            </div>
               <span>InvoiceGen</span>
             </div>
             <p>Effortless, GST-compliant invoicing for freelancers, agencies, and businesses.</p>

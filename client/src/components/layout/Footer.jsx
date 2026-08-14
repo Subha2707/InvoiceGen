@@ -7,7 +7,9 @@ const Footer = () => {
       <div className="app-footer-container">
         <div className="footer-left">
           <Link to="/dashboard" className="landing-brand">
-            <div className="brand-icon">₹</div>
+            <div className="brand-icon">
+              <img className="brand-logo-img" src="/invoice-logo.png" alt="InvoiceGen" />
+            </div>
             <span>InvoiceGen</span>
           </Link>
           <p className="footer-tagline">Fast, GST-compliant invoicing platform for businesses.</p>
