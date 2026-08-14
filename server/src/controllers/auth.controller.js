@@ -26,7 +26,7 @@ const setTokens = async (res, user) => {
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/api/auth'
   });
@@ -96,7 +96,7 @@ const googleAuthStart = asyncHandler(async (req, res) => {
   res.cookie('oauth_state', state, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Lax',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
     maxAge: 10 * 60 * 1000,
     path: '/'
   });
@@ -118,7 +118,11 @@ const googleAuthCallback = asyncHandler(async (req, res) => {
   if (error || !state || state !== cookieState) {
     return res.redirect(`${CLIENT_URL}/login?error=${error || 'google_state_mismatch'}`);
   }
-  res.clearCookie('oauth_state', { path: '/' });
+  res.clearCookie('oauth_state', {
+    path: '/',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    secure: process.env.NODE_ENV === 'production',
+  });
 
   if (!code) {
     return res.redirect(`${CLIENT_URL}/login?error=google_auth_failed`);
@@ -176,7 +180,11 @@ const logout = asyncHandler(async (req, res) => {
     req.user.refreshToken = undefined;
     await req.user.save();
   }
-  res.clearCookie('refreshToken', { path: '/api/auth' });
+  res.clearCookie('refreshToken', {
+    path: '/api/auth',
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+    secure: process.env.NODE_ENV === 'production',
+  });
   res.status(200).json(new ApiResponse(200, null, 'Logged out successfully'));
 });
 
