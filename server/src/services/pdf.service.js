@@ -1,5 +1,7 @@
 'use strict';
 
+const fs = require('fs');
+const { execSync } = require('child_process');
 const puppeteer = require('puppeteer');
 const path = require('path');
 const numberToWords = require('../utils/numberToWords');
@@ -35,8 +37,38 @@ const sanitizeData = (obj) => {
 
 let browserInstance = null;
 
+const CHROME_CACHE_DIR = path.join(__dirname, '..', '..', 'node_modules', '.cache', 'puppeteer');
+
+const chromeInstalled = () => {
+  try {
+    return fs.existsSync(puppeteer.executablePath());
+  } catch {
+    return false;
+  }
+};
+
+// Render does not reliably carry the build-time Chromium download into the
+// runtime filesystem, so the expected executable can be missing in production.
+// If it is, download it on demand into the configured cache directory
+// (node_modules/.cache/puppeteer), which is inside the persisted node_modules.
+const ensureChrome = async () => {
+  if (chromeInstalled()) return;
+  console.log(`Chromium not found in ${CHROME_CACHE_DIR}, downloading...`);
+  execSync('npx puppeteer browsers install chrome', {
+    cwd: path.join(__dirname, '..', '..'),
+    stdio: 'inherit',
+    shell: true,
+    timeout: 300000,
+  });
+  if (!chromeInstalled()) {
+    throw new Error('Chromium still missing after download');
+  }
+  console.log('Chromium ready');
+};
+
 const getBrowser = async () => {
   if (!browserInstance || !browserInstance.connected) {
+    await ensureChrome();
     browserInstance = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],

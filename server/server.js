@@ -17,8 +17,11 @@ const app = express();
 
 // Render (and most hosts) terminate TLS and forward the client IP via
 // X-Forwarded-For. Express needs to trust that hop so rate limiting and
-// req.ip work correctly. Only enabled in production to avoid spoofing in dev.
-if (process.env.NODE_ENV === 'production') {
+// req.ip work correctly. Only disabled in development to avoid spoofing.
+// Note: trust proxy is also essential for express-rate-limit, which throws
+// ERR_ERL_UNEXPECTED_X_FORWARDED_FOR when the header is present but the
+// setting is off (e.g. when NODE_ENV is unset on the host).
+if (process.env.NODE_ENV !== 'development') {
   app.set('trust proxy', 1);
 }
 
