@@ -48,12 +48,16 @@ const chromeInstalled = () => {
 };
 
 // Render does not reliably carry the build-time Chromium download into the
-// runtime filesystem, so the expected executable can be missing in production.
-// If it is, download it on demand into the configured cache directory
-// (node_modules/.cache/puppeteer), which is inside the persisted node_modules.
+// runtime filesystem, and stale build caches can leave a partial download
+// (folder exists, executable missing) which makes @puppeteer/browsers refuse
+// to re-install. Wipe the cache dir and download fresh into the persisted
+// node_modules/.cache/puppeteer whenever the executable is missing.
 const ensureChrome = async () => {
   if (chromeInstalled()) return;
-  console.log(`Chromium not found in ${CHROME_CACHE_DIR}, downloading...`);
+  console.log(`Chromium missing, cleaning ${CHROME_CACHE_DIR} and reinstalling...`);
+  try {
+    fs.rmSync(CHROME_CACHE_DIR, { recursive: true, force: true });
+  } catch {}
   execSync('npx puppeteer browsers install chrome', {
     cwd: path.join(__dirname, '..', '..'),
     stdio: 'inherit',
@@ -66,13 +70,33 @@ const ensureChrome = async () => {
   console.log('Chromium ready');
 };
 
+const isLinux = process.platform === 'linux';
+
+const launchBrowser = async () => {
+  if (isLinux) {
+    // Production (Render, Linux): use the Chromium binary shipped inside
+    // node_modules via @sparticuz/chromium. Nothing is downloaded at build or
+    // runtime, so this is immune to Render's build-cache / partial-download
+    // issues. executablePath() decompresses it into a temp dir on first use.
+    const chromium = require('@sparticuz/chromium');
+    return puppeteer.launch({
+      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
+  }
+  // Local development (Windows/macOS): use Puppeteer's bundled Chrome.
+  await ensureChrome();
+  return puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+  });
+};
+
 const getBrowser = async () => {
   if (!browserInstance || !browserInstance.connected) {
-    await ensureChrome();
-    browserInstance = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-    });
+    browserInstance = await launchBrowser();
   }
   return browserInstance;
 };
