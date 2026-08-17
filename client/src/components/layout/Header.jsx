@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -17,7 +17,6 @@ const getInitials = (name) =>
 const Header = ({ toggleSidebar }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -32,7 +31,6 @@ const Header = ({ toggleSidebar }) => {
   const handleLogout = async () => {
     setUserMenuOpen(false);
     await logout();
-    navigate('/login');
   };
 
   return (
@@ -42,39 +40,48 @@ const Header = ({ toggleSidebar }) => {
       </button>
 
       <div className="header-right">
-        <Link to="/invoices/create" className="btn btn-sm btn-primary">
-          <FiPlus /> Create Invoice
-        </Link>
+        {user ? (
+          <>
+            <Link to="/invoices/create" className="btn btn-sm btn-primary">
+              <FiPlus /> Create Invoice
+            </Link>
+
+            <div className="user-menu" ref={menuRef}>
+              <button className="user-menu-trigger" onClick={() => setUserMenuOpen(o => !o)}>
+                <span className="user-avatar">{getInitials(user?.name)}</span>
+                <span className="user-info">
+                  <span className="user-name">{user?.name}</span>
+                  <span className="user-email">{user?.email}</span>
+                </span>
+                <FiChevronDown className={`user-caret ${userMenuOpen ? 'rotate' : ''}`} />
+              </button>
+
+              {userMenuOpen && (
+                <div className="user-dropdown">
+                  <div className="dropdown-header">
+                    <strong>{user?.name}</strong>
+                    <span>{user?.email}</span>
+                  </div>
+                  <Link to="/business-profile" className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
+                    <FiSettings /> Business Profile
+                  </Link>
+                  <button className="dropdown-logout" onClick={handleLogout}>
+                    <FiLogOut /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="btn btn-sm btn-outline">Sign In</Link>
+            <Link to="/signup" className="btn btn-sm btn-primary">Get Started</Link>
+          </>
+        )}
 
         <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
           {theme === 'light' ? <FiMoon /> : <FiSun />}
         </button>
-
-        <div className="user-menu" ref={menuRef}>
-          <button className="user-menu-trigger" onClick={() => setUserMenuOpen(o => !o)}>
-            <span className="user-avatar">{getInitials(user?.name)}</span>
-            <span className="user-info">
-              <span className="user-name">{user?.name}</span>
-              <span className="user-email">{user?.email}</span>
-            </span>
-            <FiChevronDown className={`user-caret ${userMenuOpen ? 'rotate' : ''}`} />
-          </button>
-
-          {userMenuOpen && (
-            <div className="user-dropdown">
-              <div className="dropdown-header">
-                <strong>{user?.name}</strong>
-                <span>{user?.email}</span>
-              </div>
-              <Link to="/business-profile" className="dropdown-item" onClick={() => setUserMenuOpen(false)}>
-                <FiSettings /> Business Profile
-              </Link>
-              <button className="dropdown-logout" onClick={handleLogout}>
-                <FiLogOut /> Logout
-              </button>
-            </div>
-          )}
-        </div>
       </div>
     </header>
   );

@@ -25,7 +25,7 @@ const GoogleCallback = () => {
     oauthComplete(token)
       .then(() => {
         window.history.replaceState({}, document.title, '/auth/google');
-        navigate('/', { replace: true });
+        navigate('/dashboard', { replace: true });
       })
       .catch(() => {
         navigate('/login?error=google_auth_failed', { replace: true });

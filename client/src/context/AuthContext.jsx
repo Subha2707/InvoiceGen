@@ -4,6 +4,8 @@ import api from '../api/axios';
 
 const AuthContext = createContext();
 
+const INACTIVITY_TIMEOUT = 5 * 60 * 1000;
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -87,6 +89,25 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     window.location.href = '/';
   };
+
+  const logoutRef = useRef();
+  logoutRef.current = logout;
+
+  useEffect(() => {
+    if (!user) return;
+    let timer;
+    const resetTimer = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => logoutRef.current(), INACTIVITY_TIMEOUT);
+    };
+    const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+    events.forEach((e) => window.addEventListener(e, resetTimer, { passive: true }));
+    resetTimer();
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, resetTimer));
+    };
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, googleLogin, oauthComplete, logout }}>

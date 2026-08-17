@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import {
   FiFileText, FiZap, FiShield, FiSend, FiLayout, FiPieChart,
-  FiCheckCircle, FiArrowRight, FiMoon, FiSun, FiUser, FiCheck,
-  FiChevronLeft, FiChevronRight, FiMail, FiMapPin, FiPhone
+  FiCheckCircle, FiArrowRight, FiCheck,
+  FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
-import { FaGithub, FaLinkedinIn, FaInstagram, FaFacebookF } from 'react-icons/fa';
 
 const FAQ_ITEMS = [
   { q: 'Is InvoiceGen really free?', a: 'Yes, InvoiceGen is 100% free forever. Create unlimited GST-compliant invoices, download PDFs, and email clients without any credit card or hidden charges.' },
@@ -18,16 +16,8 @@ const FAQ_ITEMS = [
   { q: 'Is my data secure?', a: 'Your data is protected with JWT-based sessions, password encryption, and Google OAuth. Invoices and client records are private to your account only.' },
 ];
 
-const SOCIAL_LINKS = [
-  { icon: <FaGithub />, label: 'GitHub', href: 'https://github.com/' },
-  { icon: <FaLinkedinIn />, label: 'LinkedIn', href: 'https://linkedin.com/' },
-  { icon: <FaInstagram />, label: 'Instagram', href: 'https://instagram.com/' },
-  { icon: <FaFacebookF />, label: 'Facebook', href: 'https://facebook.com/' },
-];
-
 const Landing = () => {
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const heroRef = useRef(null);
   const [faqIndex, setFaqIndex] = useState(0);
@@ -63,42 +53,6 @@ const Landing = () => {
 
   return (
     <div className="landing-page">
-      {/* ── Navbar ── */}
-      <header className="landing-nav glassmorphism">
-        <div className="nav-container">
-          <Link to="/" className="landing-brand">
-            <div className="brand-icon">
-              <img className="brand-logo-img" src="/invoice-logo.png" alt="InvoiceGen" />
-            </div>
-            <span>InvoiceGen</span>
-          </Link>
-
-          <nav className="nav-links desktop-only">
-            <a href="#features">Features</a>
-            <a href="#templates">Templates</a>
-            <a href="#how-it-works">How It Works</a>
-            <a href="#pricing">Pricing</a>
-          </nav>
-
-          <div className="nav-actions">
-            <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
-              {theme === 'dark' ? <FiSun /> : <FiMoon />}
-            </button>
-
-            {user ? (
-              <button onClick={() => navigate('/dashboard')} className="btn btn-primary">
-                <FiUser /> Dashboard
-              </button>
-            ) : (
-              <>
-                <Link to="/login" className="btn btn-outline">Sign In</Link>
-                <Link to="/signup" className="btn btn-primary">Get Started Free</Link>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
-
       {/* ── Hero Section ── */}
       <section className="landing-hero" ref={heroRef}>
         <div className="hero-container">
@@ -415,54 +369,6 @@ const Landing = () => {
           </div>
         </div>
       </section>
-
-      {/* ── Footer ── */}
-      <footer className="landing-footer">
-        <div className="footer-container">
-          <div className="footer-brand">
-            <div className="landing-brand">
-              <div className="brand-icon">
-              <img className="brand-logo-img" src="/invoice-logo.png" alt="InvoiceGen" />
-            </div>
-              <span>InvoiceGen</span>
-            </div>
-            <p>Effortless, GST-compliant invoicing for freelancers, agencies, and businesses.</p>
-            <div className="footer-social">
-              {SOCIAL_LINKS.map((s) => (
-                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} title={s.label}>
-                  {s.icon}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div className="footer-links">
-            <div>
-              <h5>Product</h5>
-              <a href="#features">Features</a>
-              <a href="#templates">Templates</a>
-              <a href="#pricing">Pricing</a>
-            </div>
-            <div>
-              <h5>Account</h5>
-              <Link to="/login">Sign In</Link>
-              <Link to="/signup">Register</Link>
-              <Link to="/forgot-password">Reset Password</Link>
-              <Link to="/contact">Contact Us</Link>
-            </div>
-            <div>
-              <h5>Legal</h5>
-              <Link to="/privacy">Privacy Policy</Link>
-              <Link to="/terms">Terms of Service</Link>
-              <Link to="/cookies">Cookie Policy</Link>
-            </div>
-          </div>
-        </div>
-
-        <div className="footer-bottom text-center">
-          <p>© {new Date().getFullYear()} InvoiceGen. All rights reserved. Crafted with care.</p>
-        </div>
-      </footer>
     </div>
   );
 };

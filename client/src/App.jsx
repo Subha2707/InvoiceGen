@@ -24,16 +24,21 @@ const EditInvoice = lazy(() => import('./pages/EditInvoice'));
 const InvoiceView = lazy(() => import('./pages/InvoiceView'));
 
 const router = createBrowserRouter([
-  { path: '/', element: <Suspense fallback={<Loader />}><Landing /></Suspense> },
   { path: '/login', element: <Suspense fallback={<Loader />}><Login /></Suspense> },
   { path: '/signup', element: <Suspense fallback={<Loader />}><Signup /></Suspense> },
   { path: '/forgot-password', element: <Suspense fallback={<Loader />}><ForgotPassword /></Suspense> },
   { path: '/reset-password', element: <Suspense fallback={<Loader />}><ResetPassword /></Suspense> },
   { path: '/auth/google', element: <Suspense fallback={<Loader />}><GoogleCallback /></Suspense> },
-  { path: '/privacy', element: <Suspense fallback={<Loader />}><Privacy /></Suspense> },
-  { path: '/terms', element: <Suspense fallback={<Loader />}><Terms /></Suspense> },
-  { path: '/cookies', element: <Suspense fallback={<Loader />}><Cookies /></Suspense> },
-  { path: '/contact', element: <Suspense fallback={<Loader />}><Contact /></Suspense> },
+  {
+    element: <Layout />,
+    children: [
+      { path: '/', element: <Suspense fallback={<Loader />}><Landing /></Suspense> },
+      { path: '/privacy', element: <Suspense fallback={<Loader />}><Privacy /></Suspense> },
+      { path: '/terms', element: <Suspense fallback={<Loader />}><Terms /></Suspense> },
+      { path: '/cookies', element: <Suspense fallback={<Loader />}><Cookies /></Suspense> },
+      { path: '/contact', element: <Suspense fallback={<Loader />}><Contact /></Suspense> },
+    ],
+  },
   {
     element: <ProtectedRoute />,
     children: [
