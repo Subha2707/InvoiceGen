@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../ui/Toast';
 import {
   FiMenu, FiPlus, FiMoon, FiSun, FiChevronDown, FiLogOut, FiSettings, FiLogIn, FiUserPlus
 } from 'react-icons/fi';
@@ -25,6 +26,7 @@ const getInitials = (name) =>
 const Header = ({ toggleSidebar }) => {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
+  const toast = useToast();
   const location = useLocation();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
@@ -99,7 +101,7 @@ const Header = ({ toggleSidebar }) => {
       )}
 
       <div className="header-right">
-        {user ? (
+        {user && location.pathname !== '/' ? (
           <>
             <Link to="/invoices/create" className="btn btn-sm btn-primary">
               <FiPlus /> Create Invoice
@@ -133,10 +135,28 @@ const Header = ({ toggleSidebar }) => {
           </>
         ) : (
           <>
-            <Link to="/login" className="btn btn-md btn-outline">
+            <Link
+              to="/login"
+              className="btn btn-md btn-outline"
+              onClick={(e) => {
+                if (user) {
+                  e.preventDefault();
+                  toast.info('You are already logged in');
+                }
+              }}
+            >
               <FiLogIn /> Sign In
             </Link>
-            <Link to="/signup" className="btn btn-md btn-primary">
+            <Link
+              to="/signup"
+              className="btn btn-md btn-primary"
+              onClick={(e) => {
+                if (user) {
+                  e.preventDefault();
+                  toast.info('You are already logged in');
+                }
+              }}
+            >
               <FiUserPlus /> Get Started
             </Link>
           </>
