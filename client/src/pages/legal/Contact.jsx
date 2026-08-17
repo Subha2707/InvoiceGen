@@ -33,6 +33,7 @@ const Contact = () => {
       icon={<FiMail />}
       title="Contact Us"
       subtitle="We'd love to hear from you. Pick the channel that works best — we're quick to respond."
+      containerClass="contact-container"
     >
       <div className="contact-grid">
         {CARDS.map((c) => (

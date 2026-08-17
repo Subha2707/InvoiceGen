@@ -1861,9 +1861,10 @@ input[type="file"] { padding: 8px; }
 .contact-wrap {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
-  gap: 16px;
-  align-items: stretch;
+  gap: 20px;
+  align-items: start;
 }
+.contact-container { max-width: 960px; }
 .contact-form-card { display: flex; gap: 16px; }
 .contact-form { display: flex; flex-direction: column; gap: 14px; margin-top: 6px; }
 .contact-form .form-group label { margin-bottom: 4px; }
@@ -1902,12 +1903,16 @@ input[type="file"] { padding: 8px; }
   gap: 10px;
   color: var(--muted);
   font-size: 0.9rem;
-  padding: 8px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--border);
 }
 .contact-info-row:last-of-type { border-bottom: none; }
 .contact-info-row svg { color: var(--accent); flex-shrink: 0; }
-.contact-social { margin-top: auto; padding-top: 20px; }
+.contact-social {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
 
 /* ── Responsive Mobile Overhaul (< 768px & < 480px) ────────────────────────── */
 

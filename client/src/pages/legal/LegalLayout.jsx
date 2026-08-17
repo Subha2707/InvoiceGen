@@ -8,7 +8,7 @@ const LEGAL_LINKS = [
   { to: '/contact', label: 'Contact Us' },
 ];
 
-const LegalLayout = ({ icon, title, subtitle, updated, children }) => (
+const LegalLayout = ({ icon, title, subtitle, updated, children, containerClass = '' }) => (
   <div className="legal-page">
     <div className="legal-hero">
       <div className="legal-hero-inner">
@@ -31,7 +31,7 @@ const LegalLayout = ({ icon, title, subtitle, updated, children }) => (
       ))}
     </div>
 
-    <div className="legal-container">
+    <div className={`legal-container ${containerClass}`}>
       <Link to="/" className="legal-back">← Back to Home</Link>
       {children}
     </div>
