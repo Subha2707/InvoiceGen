@@ -4,6 +4,8 @@ import Table from '../components/ui/Table';
 import Modal from '../components/ui/Modal';
 import Pagination from '../components/ui/Pagination';
 import Loader from '../components/ui/Loader';
+import Avatar from '../components/ui/Avatar';
+import { useToast } from '../components/ui/Toast';
 import { useDebounce } from '../hooks/useDebounce';
 import { INDIAN_STATES, getErrorMessage } from '../utils/constants';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
@@ -16,6 +18,7 @@ const emptyForm = {
 };
 
 const Clients = () => {
+  const toast = useToast();
   const [clients, setClients] = useState([]);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 400);
@@ -116,8 +119,10 @@ const Clients = () => {
       };
       if (editingId) {
         await api.put(`/clients/${editingId}`, payload);
+        toast.success('Client updated');
       } else {
         await api.post('/clients', payload);
+        toast.success('Client added');
       }
       setModalOpen(false);
       fetchClients();
@@ -132,6 +137,7 @@ const Clients = () => {
     if (!window.confirm(`Delete client "${client.clientName}"? This cannot be undone.`)) return;
     try {
       await api.delete(`/clients/${client._id}`);
+      toast.success('Client deleted');
       fetchClients();
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to delete client'));
@@ -166,10 +172,15 @@ const Clients = () => {
               columns={['Client Name', 'Company', 'Email', 'Phone', 'State', 'Actions']}
               data={clients}
               renderRow={(client, idx) => (
-                <tr key={client._id}>
+                <tr key={client._id} className="table-row">
                   <td>
-                    <strong>{client.clientName}</strong>
-                    {client.gstNumber && <div className="table-sub">GST: {client.gstNumber}</div>}
+                    <div className="client-cell">
+                      <Avatar name={client.clientName} size={30} />
+                      <div>
+                        <strong>{client.clientName}</strong>
+                        {client.gstNumber && <div className="table-sub">GST: {client.gstNumber}</div>}
+                      </div>
+                    </div>
                   </td>
                   <td>{client.companyName || '-'}</td>
                   <td>{client.email || '-'}</td>

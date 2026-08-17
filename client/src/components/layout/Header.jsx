@@ -27,6 +27,7 @@ const Header = ({ toggleSidebar }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -36,6 +37,29 @@ const Header = ({ toggleSidebar }) => {
     document.addEventListener('mousedown', onClickOutside);
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (location.pathname !== '/') {
+      setActiveSection('');
+      return;
+    }
+    const root = document.querySelector('.main-content');
+    if (!root) return;
+    const computeActive = () => {
+      const rect = root.getBoundingClientRect();
+      const headerH = root.querySelector('.top-header')?.offsetHeight || 0;
+      const threshold = rect.top + headerH;
+      let current = '';
+      SECTION_LINKS.forEach(({ id }) => {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= threshold) current = id;
+      });
+      setActiveSection(current);
+    };
+    computeActive();
+    root.addEventListener('scroll', computeActive, { passive: true });
+    return () => root.removeEventListener('scroll', computeActive);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     setUserMenuOpen(false);
@@ -53,6 +77,12 @@ const Header = ({ toggleSidebar }) => {
         <button className="menu-btn" onClick={toggleSidebar} aria-label="Toggle sidebar">
           <FiMenu />
         </button>
+        <Link to="/" className="header-brand desktop-only" aria-label="InvoiceGen home">
+          <div className="brand-icon">
+            <img className="brand-logo-img" src="/invoice-logo.png" alt="InvoiceGen" />
+          </div>
+          <span>InvoiceGen</span>
+        </Link>
         <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
           {theme === 'light' ? <FiMoon /> : <FiSun />}
         </button>
@@ -61,7 +91,7 @@ const Header = ({ toggleSidebar }) => {
       {location.pathname === '/' && (
         <nav className="header-nav-links desktop-only">
           {SECTION_LINKS.map(({ id, label }) => (
-            <a key={id} href={`#${id}`} onClick={(e) => scrollToSection(e, id)}>
+            <a key={id} href={`#${id}`} className={activeSection === id ? 'active' : ''} onClick={(e) => scrollToSection(e, id)}>
               {label}
             </a>
           ))}

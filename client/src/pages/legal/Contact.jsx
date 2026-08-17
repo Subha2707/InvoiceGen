@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FiMail, FiPhone, FiMapPin, FiGithub, FiSend, FiClock, FiUser, FiMessageSquare } from 'react-icons/fi';
 import { FaGithub, FaLinkedinIn, FaInstagram, FaFacebookF } from 'react-icons/fa';
 import LegalLayout from './LegalLayout';
+import { useToast } from '../../components/ui/Toast';
 
 const CARDS = [
   { icon: <FiMail />, title: 'Email', value: 'support@invoicegen.app', href: 'mailto:support@invoicegen.app', hint: 'Replies within 48 hours' },
@@ -19,13 +20,14 @@ const SOCIALS = [
 
 const Contact = () => {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
-  const [sent, setSent] = useState(false);
+  const toast = useToast();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSent(true);
+    toast.success(`Thanks ${form.name || 'there'} — we've received your message and will reply within 48 hours.`);
+    setForm({ name: '', email: '', subject: '', message: '' });
   };
 
   return (
@@ -55,38 +57,27 @@ const Contact = () => {
           <div className="legal-card-icon"><FiMessageSquare /></div>
           <div style={{ width: '100%' }}>
             <h2>Send Us a Message</h2>
-            {sent ? (
-              <div className="contact-success">
-                <div className="contact-success-icon"><FiSend /></div>
-                <h3>Message sent!</h3>
-                <p>Thanks {form.name || 'there'} — we&apos;ve received your message and will reply within 48 hours.</p>
-                <button className="btn btn-outline" onClick={() => { setSent(false); setForm({ name: '', email: '', subject: '', message: '' }); }}>
-                  Send another message
-                </button>
+            <form className="contact-form" onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label htmlFor="c-name">Your Name</label>
+                <input id="c-name" name="name" value={form.name} onChange={handleChange} required placeholder="e.g. Rahul Sharma" />
               </div>
-            ) : (
-              <form className="contact-form" onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label htmlFor="c-name">Your Name</label>
-                  <input id="c-name" name="name" value={form.name} onChange={handleChange} required placeholder="e.g. Rahul Sharma" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="c-email">Email Address</label>
-                  <input id="c-email" type="email" name="email" value={form.email} onChange={handleChange} required placeholder="you@example.com" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="c-subject">Subject</label>
-                  <input id="c-subject" name="subject" value={form.subject} onChange={handleChange} required placeholder="How can we help?" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="c-message">Message</label>
-                  <textarea id="c-message" name="message" value={form.message} onChange={handleChange} required rows="5" placeholder="Tell us what's on your mind..." />
-                </div>
-                <button type="submit" className="btn btn-primary">
-                  <FiSend /> Send Message
-                </button>
-              </form>
-            )}
+              <div className="form-group">
+                <label htmlFor="c-email">Email Address</label>
+                <input id="c-email" type="email" name="email" value={form.email} onChange={handleChange} required placeholder="you@example.com" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="c-subject">Subject</label>
+                <input id="c-subject" name="subject" value={form.subject} onChange={handleChange} required placeholder="How can we help?" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="c-message">Message</label>
+                <textarea id="c-message" name="message" value={form.message} onChange={handleChange} required rows="5" placeholder="Tell us what's on your mind..." />
+              </div>
+              <button type="submit" className="btn btn-primary">
+                <FiSend /> Send Message
+              </button>
+            </form>
           </div>
         </section>
 

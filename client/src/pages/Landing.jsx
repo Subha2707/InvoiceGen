@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Avatar from '../components/ui/Avatar';
 import {
   FiFileText, FiZap, FiShield, FiSend, FiLayout, FiPieChart,
   FiCheckCircle, FiArrowRight, FiCheck,
@@ -16,6 +17,12 @@ const FAQ_ITEMS = [
   { q: 'Is my data secure?', a: 'Your data is protected with JWT-based sessions, password encryption, and Google OAuth. Invoices and client records are private to your account only.' },
 ];
 
+const TESTIMONIALS = [
+  { name: 'Rahul Sharma', role: 'Freelance Web Developer', quote: 'InvoiceGen saves me hours every month. GST is calculated automatically, and the PDFs look incredibly professional.' },
+  { name: 'Priya Verma', role: 'Design Studio Owner', quote: 'I switched from spreadsheets to InvoiceGen and never looked back. The templates are beautiful and clients love them.' },
+  { name: 'Amit Kumar', role: 'Agency Founder', quote: 'The one-click emailing and client management are game changers. My invoices get paid much faster now.' },
+];
+
 const Landing = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -23,11 +30,13 @@ const Landing = () => {
   const [faqIndex, setFaqIndex] = useState(0);
 
   useEffect(() => {
+    const root = document.querySelector('.main-content');
+    if (!root) return;
     const applyParallax = () => {
       const el = heroRef.current;
       if (!el) return;
-      const offset = window.scrollY;
-      if (offset < window.innerHeight) {
+      const offset = root.scrollTop;
+      if (offset < root.clientHeight) {
         el.querySelectorAll('[data-parallax]').forEach((node) => {
           const speed = parseFloat(node.getAttribute('data-parallax')) || 0;
           node.style.transform = `translateY(${offset * speed}px)`;
@@ -37,13 +46,13 @@ const Landing = () => {
     let ticking = false;
     const onScroll = () => {
       if (!ticking) {
-        window.requestAnimationFrame(() => { applyParallax(); ticking = false; });
+        root.requestAnimationFrame(() => { applyParallax(); ticking = false; });
         ticking = true;
       }
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
+    root.addEventListener('scroll', onScroll, { passive: true });
     applyParallax();
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => root.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
@@ -320,6 +329,33 @@ const Landing = () => {
               Start Invoicing Free
             </Link>
           )}
+        </div>
+      </section>
+
+      {/* ── Testimonials ── */}
+      <section id="testimonials" className="landing-section">
+        <div className="section-container">
+          <div className="section-header text-center">
+            <span className="section-tag">LOVED BY BUSINESSES</span>
+            <h2>Trusted by Freelancers & Growing Businesses</h2>
+            <p>Thousands of invoices created and paid faster with InvoiceGen.</p>
+          </div>
+
+          <div className="testimonials-grid">
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className="testimonial-card glassmorphism">
+                <div className="testimonial-stars" aria-label="5 out of 5 stars">★★★★★</div>
+                <p className="testimonial-quote">"{t.quote}"</p>
+                <div className="testimonial-author">
+                  <Avatar name={t.name} size={38} />
+                  <div>
+                    <strong>{t.name}</strong>
+                    <span>{t.role}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

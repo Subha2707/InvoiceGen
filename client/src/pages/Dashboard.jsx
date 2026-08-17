@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-import Loader from '../components/ui/Loader';
 import StatusBadge from '../components/ui/StatusBadge';
+import Avatar from '../components/ui/Avatar';
 import Table from '../components/ui/Table';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { FiFileText, FiCheckCircle, FiClock, FiAlertCircle, FiPlus, FiSettings } from 'react-icons/fi';
@@ -11,6 +11,41 @@ import { formatCurrency, formatDate } from '../utils/invoiceCalc';
 import { getErrorMessage } from '../utils/constants';
 
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+const SkeletonLine = ({ className = '', style }) => <div className={`skeleton skeleton-line ${className}`} style={style} />;
+
+const DashboardSkeleton = () => (
+  <div className="page-container">
+    <SkeletonLine className="w-50" style={{ height: 28, marginBottom: 8 }} />
+    <SkeletonLine className="w-35" style={{ height: 16, marginBottom: 20 }} />
+    <div className="stats-grid">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div className="stat-card" key={i}>
+          <SkeletonLine className="w-40" style={{ height: 14, marginBottom: 12 }} />
+          <SkeletonLine className="w-60" style={{ height: 26 }} />
+        </div>
+      ))}
+    </div>
+    <div className="stats-grid">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div className="stat-card" key={i}>
+          <SkeletonLine className="w-40" style={{ height: 14, marginBottom: 12 }} />
+          <SkeletonLine className="w-60" style={{ height: 26 }} />
+        </div>
+      ))}
+    </div>
+    <div className="dashboard-content">
+      <div className="glassmorphism">
+        <SkeletonLine className="w-40" style={{ height: 16, marginBottom: 16 }} />
+        <div className="skeleton skeleton-block" style={{ height: 260 }} />
+      </div>
+      <div className="glassmorphism">
+        <SkeletonLine className="w-40" style={{ height: 16, marginBottom: 16 }} />
+        <div className="skeleton skeleton-block" style={{ height: 260 }} />
+      </div>
+    </div>
+  </div>
+);
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -47,7 +82,7 @@ const Dashboard = () => {
     fetchDashboard();
   }, []);
 
-  if (loading) return <Loader label="Loading dashboard stats..." />;
+  if (loading) return <DashboardSkeleton />;
 
   const chartData = (stats?.monthlyData || []).map(item => ({
     name: monthNames[(item._id.month - 1)] || '',
@@ -72,6 +107,18 @@ const Dashboard = () => {
             <p>Add your business details once — they appear automatically on every invoice.</p>
           </div>
           <Link to="/business-profile" className="btn btn-primary"><FiSettings /> Setup Profile</Link>
+        </div>
+      )}
+
+      {stats?.totalInvoices === 0 && (
+        <div className="dashboard-empty glassmorphism">
+          <div className="dashboard-empty-icon"><FiFileText /></div>
+          <h3>No invoices yet</h3>
+          <p>Create your first professional GST invoice and start getting paid faster.</p>
+          <div className="dashboard-empty-actions">
+            <Link to="/invoices/create" className="btn btn-primary"><FiPlus /> Create your first invoice</Link>
+            <Link to="/business-profile" className="btn btn-outline"><FiSettings /> Set up business profile</Link>
+          </div>
         </div>
       )}
 
@@ -150,7 +197,12 @@ const Dashboard = () => {
                 <td>
                   <Link to={`/invoices/view/${inv._id}`} className="link-primary">{inv.invoiceNumber}</Link>
                 </td>
-                <td>{inv.clientSnapshot?.clientName || inv.client?.clientName || '-'}</td>
+                <td>
+                  <div className="client-cell">
+                    <Avatar name={inv.clientSnapshot?.clientName || inv.client?.clientName} size={28} />
+                    <span>{inv.clientSnapshot?.clientName || inv.client?.clientName || '-'}</span>
+                  </div>
+                </td>
                 <td>{formatDate(inv.issueDate)}</td>
                 <td>{formatCurrency(inv.grandTotal, inv.currency)}</td>
                 <td><StatusBadge status={inv.status} /></td>

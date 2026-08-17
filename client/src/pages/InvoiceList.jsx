@@ -4,16 +4,26 @@ import api from '../api/axios';
 import Table from '../components/ui/Table';
 import Pagination from '../components/ui/Pagination';
 import StatusBadge from '../components/ui/StatusBadge';
+import Avatar from '../components/ui/Avatar';
 import Loader from '../components/ui/Loader';
+import { useToast } from '../components/ui/Toast';
 import { useDebounce } from '../hooks/useDebounce';
 import { formatCurrency, formatDate } from '../utils/invoiceCalc';
 import { getErrorMessage } from '../utils/constants';
 import { FiDownload, FiEdit2, FiEye, FiTrash2, FiCopy, FiFilter } from 'react-icons/fi';
 
+const STATUS_FILTERS = [
+  { value: '', label: 'All' },
+  { value: 'draft', label: 'Draft' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'paid', label: 'Paid' },
+  { value: 'overdue', label: 'Overdue' },
+];
+
 const InvoiceList = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [toast, setToast] = useState(location.state?.toast || null);
+  const toast = useToast();
 
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -29,6 +39,11 @@ const InvoiceList = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [error, setError] = useState(null);
   const [busyId, setBusyId] = useState(null);
+
+  useEffect(() => {
+    if (location.state?.toast) toast.success(location.state.toast);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
@@ -60,13 +75,6 @@ const InvoiceList = () => {
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch, status, dateFrom, dateTo]);
-
-  useEffect(() => {
-    if (toast) {
-      const t = setTimeout(() => setToast(null), 3500);
-      return () => clearTimeout(t);
-    }
-  }, [toast]);
 
   const downloadPdf = async (invoice) => {
     setBusyId(invoice._id);
@@ -107,7 +115,7 @@ const InvoiceList = () => {
     setBusyId(invoice._id);
     try {
       await api.delete(`/invoices/${invoice._id}`);
-      setToast('Invoice deleted');
+      toast.success('Invoice deleted');
       fetchInvoices();
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to delete invoice'));
@@ -134,8 +142,6 @@ const InvoiceList = () => {
 
   return (
     <div className="page-container">
-      {toast && <div className="alert alert-success">{toast}</div>}
-
       <div className="page-header">
         <div>
           <h2>Invoices</h2>
@@ -160,19 +166,21 @@ const InvoiceList = () => {
         </button>
       </div>
 
+      <div className="filter-chips">
+        {STATUS_FILTERS.map((f) => (
+          <button
+            key={f.value || 'all'}
+            className={`chip${status === f.value ? ' active' : ''}`}
+            onClick={() => setStatus(f.value)}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       {showFilters && (
         <div className="filters-panel glassmorphism">
           <div className="grid-3">
-            <div className="form-group">
-              <label>Status</label>
-              <select value={status} onChange={e => setStatus(e.target.value)}>
-                <option value="">All Status</option>
-                <option value="draft">Draft</option>
-                <option value="pending">Pending</option>
-                <option value="paid">Paid</option>
-                <option value="overdue">Overdue</option>
-              </select>
-            </div>
             <div className="form-group">
               <label>From Date</label>
               <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} />
@@ -200,14 +208,19 @@ const InvoiceList = () => {
               columns={['Invoice No', 'Client', 'Issue Date', 'Due Date', 'Amount', 'Status', 'Actions']}
               data={invoices}
               renderRow={(inv) => (
-                <tr key={inv._id}>
+                <tr key={inv._id} className="table-row">
                   <td>
                     <Link to={`/invoices/view/${inv._id}`} className="link-primary">{inv.invoiceNumber}</Link>
                     {inv.clientSnapshot?.companyName && (
                       <div className="table-sub">{inv.clientSnapshot.companyName}</div>
                     )}
                   </td>
-                  <td>{inv.clientSnapshot?.clientName || inv.client?.clientName || '-'}</td>
+                  <td>
+                    <div className="client-cell">
+                      <Avatar name={inv.clientSnapshot?.clientName || inv.client?.clientName} size={28} />
+                      <span>{inv.clientSnapshot?.clientName || inv.client?.clientName || '-'}</span>
+                    </div>
+                  </td>
                   <td>{formatDate(inv.issueDate)}</td>
                   <td>{inv.dueDate ? formatDate(inv.dueDate) : '-'}</td>
                   <td className="text-right">{formatCurrency(inv.grandTotal, inv.currency)}</td>
