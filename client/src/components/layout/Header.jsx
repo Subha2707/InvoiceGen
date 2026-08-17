@@ -49,9 +49,14 @@ const Header = ({ toggleSidebar }) => {
 
   return (
     <header className="top-header">
-      <button className="menu-btn" onClick={toggleSidebar} aria-label="Toggle sidebar">
-        <FiMenu />
-      </button>
+      <div className="header-left">
+        <button className="menu-btn" onClick={toggleSidebar} aria-label="Toggle sidebar">
+          <FiMenu />
+        </button>
+        <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
+          {theme === 'light' ? <FiMoon /> : <FiSun />}
+        </button>
+      </div>
 
       {location.pathname === '/' && (
         <nav className="header-nav-links desktop-only">
@@ -106,10 +111,6 @@ const Header = ({ toggleSidebar }) => {
             </Link>
           </>
         )}
-
-        <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
-          {theme === 'light' ? <FiMoon /> : <FiSun />}
-        </button>
       </div>
     </header>
   );
