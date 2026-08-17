@@ -98,10 +98,10 @@ const Header = ({ toggleSidebar }) => {
           </>
         ) : (
           <>
-            <Link to="/login" className="btn btn-sm btn-outline">
+            <Link to="/login" className="btn btn-md btn-outline">
               <FiLogIn /> Sign In
             </Link>
-            <Link to="/signup" className="btn btn-sm btn-primary">
+            <Link to="/signup" className="btn btn-md btn-primary">
               <FiUserPlus /> Get Started
             </Link>
           </>
