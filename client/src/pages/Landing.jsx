@@ -46,7 +46,7 @@ const Landing = () => {
     let ticking = false;
     const onScroll = () => {
       if (!ticking) {
-        root.requestAnimationFrame(() => { applyParallax(); ticking = false; });
+        window.requestAnimationFrame(() => { applyParallax(); ticking = false; });
         ticking = true;
       }
     };
